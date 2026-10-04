@@ -1,0 +1,26 @@
+# RECORDED DATA NEVER LEAVES THIS MACHINE.
+#
+# captures/ holds the owner's EEG. This is first in the file for the same reason it
+# is first in the constitution. This repository is destined to be open-sourced
+# as the GUI half of the IntoMind stack, and a person's neural recordings do
+# not go out with the software that happened to write them.
+#
+# The recordings still LIVE here, beside the analyses that formatted them and
+# read them back. They are simply not this repository's content: the repository
+# is for the software. Untracked on 2026-08-19, at the owner's instruction.
+captures/
+*.npz
+*.meta.json
+*.events.json
+*.inputs.npz
+*.sha256
+SESSIONS.jsonl
+
+__pycache__/
+*.pyc
+
+# Derived from captures/, regenerable. The record is captures/<label>.npz.
+exports/
+
+# Machine map and internal-name list stay local.
+tests/internal-names.txt

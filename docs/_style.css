@@ -1,0 +1,37 @@
+/* Shared by the documentation pages. Same palette as the Command Center, but a
+   document layout rather than a dashboard one: docs are read top to bottom, so
+   this page scrolls where the app deliberately does not. */
+:root{--bg:#0e0f12;--pn:#16181d;--pn2:#1b1e25;--ln:#2a2e37;--fg:#dfe3ea;
+--mut:#8b93a1;--ok:#5fd08a;--warn:#e0b341;--err:#e0605e;--ac:#5aa9e6}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);
+font:16px/1.65 ui-sans-serif,system-ui,sans-serif}
+header{padding:.7rem 1rem;background:var(--pn);border-bottom:1px solid var(--ln);
+display:flex;align-items:center;gap:1rem}
+header .t{font-weight:600}
+header a{color:var(--ac);text-decoration:none;font-size:14px}
+header .spacer{flex:1}
+main{max-width:52rem;margin:0 auto;padding:2rem 1.2rem 5rem}
+h1{font-size:26px;margin:0 0 .3rem}
+.lede{color:var(--mut);margin:0 0 2rem}
+h2{font-size:19px;margin:2.2rem 0 .6rem;padding-top:1.2rem;
+border-top:1px solid var(--ln)}
+h3{font-size:15px;margin:1.4rem 0 .4rem}
+p,li{color:var(--fg)}
+code{font:13.5px ui-monospace,monospace;background:var(--pn2);
+padding:.1rem .3rem;border-radius:3px;color:#cfe6ff}
+pre{background:var(--pn2);border:1px solid var(--ln);border-radius:6px;
+padding:.8rem 1rem;overflow-x:auto}
+pre code{background:none;padding:0}
+table{border-collapse:collapse;width:100%;margin:.6rem 0;font-size:14.5px}
+th,td{text-align:left;padding:.4rem .6rem;border-bottom:1px solid var(--ln);
+vertical-align:top}
+th{color:var(--mut);font-weight:600}
+.note{background:var(--pn);border-left:3px solid var(--ac);
+padding:.7rem 1rem;margin:1rem 0;border-radius:0 4px 4px 0}
+.note.warn{border-left-color:var(--warn)}
+.note p{margin:.3rem 0}
+.note b{color:var(--fg)}
+a{color:var(--ac)}
+footer{border-top:1px solid var(--ln);color:var(--mut);font-size:13.5px;
+padding:1rem;text-align:center}

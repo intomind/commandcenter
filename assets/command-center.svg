@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <!-- The IntoMind Command Center. An instrument: a lit screen in a bezel,
+       showing the two channels on one timebase.
+       Colours are the page's own. The bezel is the blue of its primary
+       action (#2f6ea8), ch1 green then ch2 blue, in that order because that is
+       the order hub.html draws them in.
+       The bezel exists for the dock: a dark panel alone renders as a black
+       square at 24 px. Two waveform cycles, not six, for the same reason. -->
+  <defs>
+    <linearGradient id="bezel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2f6ea8"/>
+      <stop offset="1" stop-color="#0f3459"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="4" y="4" width="120" height="120" rx="26" fill="url(#bezel)"/>
+  <rect x="4.5" y="4.5" width="119" height="119" rx="25.5" fill="none"
+        stroke="#5aa9e6" stroke-width="1.5"/>
+
+  <!-- the screen -->
+  <rect x="19" y="23" width="90" height="82" rx="11" fill="#0e0f12"/>
+
+  <!-- ch1: a rhythm -->
+  <path d="M28 52 q9 -17 18 0 q9 17 18 0 q9 -17 18 0 q9 17 18 0"
+        fill="none" stroke="#5fd08a" stroke-width="7"
+        stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- ch2: a transient, so the lanes are visibly two different signals and not
+       one waveform drawn twice -->
+  <path d="M28 80 h13 l7 -13 l8 30 l7 -19 l6 6 h11 l7 -10 l8 16 l5 -10"
+        fill="none" stroke="#8ecbf5" stroke-width="7"
+        stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

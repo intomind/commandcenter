@@ -1,0 +1,181 @@
+<!doctype html><meta charset=utf-8>
+<title>Developer guide - Neuroscientific Command Center</title>
+<link rel=stylesheet href="/docs/_style.css">
+<header>
+  <span class=t>Neuroscientific Command Center</span>
+  <span class=spacer></span>
+  <a href="/">Back to the app</a>
+  <a href="/docs/user">User guide</a>
+</header>
+<main>
+
+<h1>Developer guide</h1>
+<p class=lede>Extending the Command Center with your own experiments and
+analyses.</p>
+
+<div class=note>
+  <p>This is about adding to <b>this application</b>. If you want to talk to a
+  device from your own program, without the app, that is the API documentation
+  and it is published separately.</p>
+</div>
+
+<h2>How the pieces fit</h2>
+<table>
+  <tr><th>Layer</th><th>Responsibility</th></tr>
+  <tr><td>Device client</td><td>One connection: control, sample stream, clock
+    mapping. Knows nothing about experiments.</td></tr>
+  <tr><td>Hub</td><td>Holds the single connection, runs experiments, serves the
+    page and the HTTP API.</td></tr>
+  <tr><td>Page</td><td>Renders controls from what the device reports it can do,
+    rather than from assumptions about a particular device.</td></tr>
+  <tr><td>Registries</td><td>Experiments and analyses are entries in a registry.
+    Adding one is data plus a function, not an edit to the app.</td></tr>
+</table>
+
+<h2>Three rules that are not negotiable</h2>
+<h3>An experiment never sets instrument settings</h3>
+<p>The settings a device offers describe the instrument and are chosen by the
+operator. A protocol that quietly changed them would produce a recording whose
+settings nobody chose. If your protocol needs a particular setting, document
+that for the operator. Do not impose it.</p>
+
+<h3>Recordings are immutable</h3>
+<p>A capture is written read-only with a checksum. Analyses never modify it, and
+filters applied during analysis affect only that analysis. The only operation
+that removes a recording is an explicit delete.</p>
+
+<h3>The device answers for itself</h3>
+<p>The channel count, the resolution, the rates, whether there is lead-off
+detection, whether there is a model: all of it is asked over the protocol and
+none of it is assumed. The page renders its controls from
+<code>device.profile()</code>, so a control that appears is one the device
+declared. A table of specific hardware in this application is a defect, and a
+control rendered from anything but the device's answer is the same defect one
+layer up.</p>
+
+<h2>Adding an experiment</h2>
+<p>An experiment is an async function registered with a decorator. It declares
+its parameters, and optionally a pre-registered analysis plan.</p>
+<pre><code>@experiment("my_protocol",
+            "One line describing what it measures.",
+            [dict(name="trials", type="number", default=20),
+             dict(name="hold_s", type="number", default=2.0),
+             dict(name="note",   type="text",   default="")] + TONE_PARAMS,
+            prereg=dict(name="my_protocol", window_s=1.0, min_ratio=5.0))
+async def my_protocol(dev, rec, sh, emit, p, ctx):
+    conds = ["go"] * int(p["trials"])
+    return await _cued_trials(
+        dev, rec, sh, emit, p, ctx, label=_lbl(ctx, "my"), conds=conds,
+        texts={"go": "Do the thing"}, rest_text="Rest",
+        hold_s=float(p["hold_s"]), rest_s=3.0,
+        intro="My protocol. Do the thing when told, rest when told.",
+        extra=dict(experiment="my_protocol"))</code></pre>
+
+<h3>Cued trials</h3>
+<p>Use <code>_cued_trials</code> for anything event-locked. It shuffles the trial
+order with a fixed seed and writes that order into the recording, because a
+subject who can predict the next cue is a different subject.</p>
+
+<div class="note warn">
+  <p><b>Every cue that starts a state needs a cue that ends it.</b> Pass
+  <code>rest_text</code>. A protocol that says "clench" and then goes silent
+  reads as "keep clenching", and the contrast the analysis depends on
+  disappears. This has actually happened here.</p>
+</div>
+
+<h3>Sham trials</h3>
+<p>Interleave a sham condition that cues the subject to do nothing. It controls
+for the cue itself: the sound, the audio path, and any electrical artifact
+locked to it. If your effect also appears on sham trials, it is not what you
+think it is.</p>
+
+<h3>What gets written</h3>
+<p>Raw samples first, then the manifest, then the checksums. Checksums are
+written last, so a run that dies mid-save leaves no checksum and can never be
+mistaken for a complete recording.</p>
+
+<h2>Adding an analysis</h2>
+<p>An analysis is a function of a recording label plus keyword parameters,
+returning a dictionary. It is registered by name with its parameter
+declarations.</p>
+<pre><code>def my_analysis(label: str, window_s=1.0, min_ratio=5.0) -> dict:
+    cap = load(label)                 # refuses silently-corrupted bytes
+    ev  = events(label)               # cue timestamps, if the run had any
+    ...
+    return dict(label=label, analysis="my_analysis",
+                analysis_version=ANALYSIS_VERSION,
+                channels=[...], criteria={...}, verdict="PASS")
+
+ANALYSES["my_analysis"] = dict(
+    fn=my_analysis, needs_events=True,
+    doc="One line describing what it decides.",
+    params=[_n("window_s", 1.0), _n("min_ratio", 5.0)])</code></pre>
+
+<h3>Pre-register the criteria</h3>
+<p>Fix your thresholds before you see the data and return them in
+<code>params</code>, so the result records what it was judged against. Choosing
+a threshold after looking makes the result exploratory, and it should say so.</p>
+
+<h3>Pair over trials</h3>
+<p>Compare each trial against its own baseline rather than pooling every epoch.
+Pooling treats correlated samples as independent and inflates significance.</p>
+
+<h3>Give it a renderer</h3>
+<p>Add a branch to the page's result renderer so your analysis produces a
+readable table rather than raw JSON. Analyses are also mapped to the experiment
+that produces them, so selecting such a recording picks your analysis
+automatically.</p>
+
+<h2>Results are cached</h2>
+<p>An analysis is pure and a recording is immutable, so a result computed once
+is reused. The cache key covers the analysis, the recording and the parameters.
+Nothing you write needs to be fast to be usable, but it must be
+<b>deterministic</b>: the same inputs must always give the same answer, or
+caching will make it look intermittent.</p>
+
+<h2>The HTTP API</h2>
+<p>The page talks to the hub over these. They are stable enough to script
+against.</p>
+<table>
+  <tr><th>Endpoint</th><th>Purpose</th></tr>
+  <tr><td><code>GET /api/experiments</code></td><td>Registered protocols and their parameters</td></tr>
+  <tr><td><code>GET /api/analyses</code></td><td>Registered analyses and their parameters</td></tr>
+  <tr><td><code>GET /api/captures</code></td><td>Recordings with their metadata and integrity</td></tr>
+  <tr><td><code>GET /api/status</code></td><td>Connection state and the instrument's actual configuration</td></tr>
+  <tr><td><code>POST /api/run</code></td><td>Start a protocol</td></tr>
+  <tr><td><code>POST /api/stop</code></td><td>Stop the running protocol</td></tr>
+  <tr><td><code>POST /api/analyze</code></td><td>Run an analysis over selected recordings</td></tr>
+  <tr><td><code>POST /api/config</code></td><td>Change a setting the device declared</td></tr>
+  <tr><td><code>POST /api/live</code></td><td>Start or stop the live stream</td></tr>
+  <tr><td><code>POST /api/scan</code></td><td>Listen for devices. Each reaches the page as it answers, and nothing is connected</td></tr>
+  <tr><td><code>POST /api/connect</code></td><td>Connect the one device picked from the scan, by its address</td></tr>
+  <tr><td><code>POST /api/disconnect</code></td><td>Release the device</td></tr>
+  <tr><td><code>POST /api/contact_check</code></td><td>Check electrode contact once</td></tr>
+  <tr><td><code>POST /api/marker</code></td><td>Timestamp an event in the running recording</td></tr>
+  <tr><td><code>POST /api/tone</code></td><td>Play a cue, to preview it</td></tr>
+  <tr><td><code>GET /api/model</code></td><td>The device's model and its head slots</td></tr>
+  <tr><td><code>POST /api/head</code></td><td>Select a head slot</td></tr>
+  <tr><td><code>POST /api/predictions</code></td><td>Turn the model's output on or off</td></tr>
+  <tr><td><code>POST /api/identify</code></td><td>Blink the device's light for a few seconds, to tell it from others</td></tr>
+  <tr><td><code>GET /api/registers</code></td><td>The converter's registers, raw and in words, for debugging</td></tr>
+  <tr><td><code>POST /api/embeddings</code></td><td>Collect whole windows of the model's embeddings from the live stream into a file</td></tr>
+  <tr><td><code>GET /api/formats</code></td><td>The formats the library writes</td></tr>
+  <tr><td><code>POST /api/export</code></td><td>Write a capture out, and report what it cost</td></tr>
+  <tr><td><code>POST /api/delete</code></td><td>Delete recordings permanently</td></tr>
+  <tr><td><code>GET /ws</code></td><td>Live status, samples, predictions, cues and progress</td></tr>
+</table>
+<p>They answer the machine they run on and nothing else. The Host and Origin
+headers are checked on every request, including the WebSocket handshake, because
+a page anywhere on the internet can otherwise make a browser reach a server on
+localhost.</p>
+
+<h2>Exporting</h2>
+<p>Every format comes from <code>intomind.export</code>. This application writes
+no file format of its own, because a second writer is a second set of rules
+about what a capture means and the two would drift. The route offers
+<code>export.FORMATS</code> and returns the exporter's summary unchanged,
+including its measurement of whether that file returned every sample at the
+value it was recorded at.</p>
+
+</main>
+<footer>Built by <a href="https://intomind.com">IntoMind</a> &copy; 2026</footer>

@@ -1,0 +1,169 @@
+<!doctype html><meta charset=utf-8>
+<title>User guide - Neuroscientific Command Center</title>
+<link rel=stylesheet href="/docs/_style.css">
+<header>
+  <span class=t>Neuroscientific Command Center</span>
+  <span class=spacer></span>
+  <a href="/">Back to the app</a>
+  <a href="/docs/dev">Developer guide</a>
+</header>
+<main>
+
+<h1>User guide</h1>
+<p class=lede>How to record and analyze a session with your IntoMind device.</p>
+
+<h2>Connecting</h2>
+<p>The Command Center never connects by itself. When it opens with nothing
+connected, it lists every device it hears, as each one answers, by its name
+and its address, with the one you picked last time first. When two share a
+name, the later ones are numbered. Click the one you mean, and only that one
+is connected. <b>Connect</b> lists them again at any time.</p>
+<p>The indicator at the top of the window tells you where things stand:</p>
+<table>
+  <tr><th>Indicator</th><th>Meaning</th></tr>
+  <tr><td>No device</td><td>Nothing is connected. Press <b>Connect</b> and pick your device.</td></tr>
+  <tr><td>Connecting</td><td>The device you picked is being connected.</td></tr>
+  <tr><td>Your device, streaming</td><td>Connected. The traces are live.</td></tr>
+  <tr><td>Recording</td><td>An experiment is running and data is being written to disk.</td></tr>
+</table>
+<p>While a device is connected the button reads <b>Disconnect</b>. It asks
+before it lets go, and it waits while a recording runs. You would use it to
+hand the device to another program, because only one program can hold the
+link at a time.</p>
+
+<div class="note warn">
+  <p><b>One program at a time.</b> If a second program connects to the same
+  device, both may receive every sample twice. Close one of them. Restarting
+  Bluetooth appears to fix this, but only because it drops the other
+  connection.</p>
+</div>
+
+<h2>Detail level</h2>
+<p>The <b>Basic</b>, <b>Intermediate</b> and <b>Advanced</b> buttons change how
+much the page shows you. They never change what the device does, and switching
+between them will not alter a recording in progress.</p>
+<p>Every setting your device reports is stated at every level, because what
+the instrument was set to is part of what a recording means. What changes is
+what you may alter: Basic states them and changes nothing, Intermediate lets
+you set the everyday ones, and Advanced adds the diagnostics that are only
+meaningful on a bench.</p>
+
+<h2>BCI settings</h2>
+<p>Open the settings drawer from the top right. What it holds depends on what your device says it can do.</p>
+
+<h3>Connected device</h3>
+<p>What the device reported about itself: how many channels, its resolution, its
+firmware version. Read-only.</p>
+
+<h3>Configuration</h3>
+<p>The instrument's actual configuration, read back from the device rather than
+remembered from what was last requested. If a setting shows as unknown, the
+device has not answered for it, and the app will say so rather than guess.</p>
+<table>
+  <tr><th>Setting</th><th>What it does</th></tr>
+  <tr><td>Gain</td><td>How much the signal is amplified before it is digitized.
+    Higher gain resolves smaller signals but leaves less room before the input
+    saturates.</td></tr>
+  <tr><td>Sample rate</td><td>Samples per second, per channel. A higher rate
+    captures faster activity and produces larger recordings.</td></tr>
+  <tr><td>Signal source</td><td>What the amplifier is listening to. Normally
+    the electrodes. A test signal or a shorted input is a bench check of the
+    instrument rather than a recording of you.</td></tr>
+  <tr><td>Contact detection</td><td>Whether the device watches for an
+    electrode coming off. See below.</td></tr>
+</table>
+<p>Only the settings your device reports are shown. A device that offers fewer
+of them shows fewer, and one that offers something this guide does not list
+shows that too, under the name the device gave it.</p>
+
+<h3>Electrode contact</h3>
+<p>This appears only if your device can detect an electrode coming off. Press
+<b>Check electrode contact</b> to test each electrode once. The check briefly
+passes a very small current through the electrodes, which you will not feel.</p>
+<p>You can also leave detection on, from the Configuration list, and then the
+page tells you the moment an electrode comes off during a recording. The cost
+is that the same small current flows the whole time, and it disturbs the signal
+the electrodes are measuring. On a marginal electrode it can flatten a channel
+entirely. That is why it is off unless you turn it on.</p>
+<p>Two independent indicators are reported separately, and they can disagree.
+That disagreement is information, not a fault: one detects an electrode that is
+completely disconnected, the other looks at the voltage the skin contact
+develops. A pair of electrodes can be in contact and still show a small voltage
+difference, so a low reading does not on its own mean a bad contact.</p>
+
+<h3>Model</h3>
+<p>This appears only if your device carries a model. A model turns a few
+seconds of signal into an answer, on the device, without sending anything
+anywhere. The answer comes from a <b>head</b>, which is a small set of weights
+trained for one question, and your device holds several of them in numbered
+slots.</p>
+<p>Pick a head, turn predictions on, and the output appears under the traces
+with the head that produced it. If the window it was computed from had a gap in
+it, or an electrode was off, the page says so beside the number, because that
+output is worth less than one from a clean window.</p>
+<p>Heads are trained from a recording with the instrument library and uploaded
+from there. There is no way to train one from this page, and there should not
+be: what a head does on your device has to match what it does on the host
+exactly, and one implementation is how that stays true.</p>
+
+<h2>Running an experiment</h2>
+<p>Choose a protocol in the Experiment panel on the left, set its parameters,
+and press <b>Run experiment</b>. Cued protocols speak their instructions aloud,
+so you can keep your eyes closed or fixed where the protocol asks.</p>
+<p>An experiment never changes your instrument settings. It records at whatever
+the device is configured to, so the settings you chose are the settings you
+get.</p>
+<p><b>Markers</b> let you timestamp something during a recording. Each name you
+add becomes a button, and pressing it records the moment you pressed it.</p>
+<p><b>Stop</b> ends a run early. What was recorded up to that point is kept and
+marked as stopped early.</p>
+
+<h2>Recordings and analysis</h2>
+<p>Every run is written to disk before any analysis touches it, along with the
+full instrument configuration and any event markers. Recordings are listed in
+the Analysis panel on the right, newest first, with a badge showing whether
+their contents still match the checksum written when they were recorded.</p>
+<p><b>Select a recording and it is analyzed automatically.</b> The analysis that
+matches how it was recorded is chosen for you, and a standard summary and
+frequency spectrum are always computed alongside it. Results are cached, so
+returning to a recording is immediate however long it is.</p>
+<p>You can pick a different analysis from the dropdown. If you choose one that
+does not match how the recording was made, the page says so, because the result
+is unlikely to be meaningful. A general recording has no expected analysis, so
+any choice is legitimate and nothing is said.</p>
+
+<h3>Filters and parameters in analysis</h3>
+<p>These apply to the analysis only. The recording on disk is never changed, so
+you can analyze the same data several ways without losing anything.</p>
+
+<h2>Exporting</h2>
+<p>Choose what to export, then a format. Six are offered.</p>
+<table>
+  <tr><th>Format</th><th>What it is</th></tr>
+  <tr><td>NPZ</td><td>A numpy archive: microvolts, both clocks, the marks and
+    the manifest. The natural choice for analysis in Python.</td></tr>
+  <tr><td>EDF+</td><td>The clinical container almost everything reads. Sixteen
+    bits wide.</td></tr>
+  <tr><td>BDF+</td><td>The same container at twenty-four bits, which is as wide
+    as the record.</td></tr>
+  <tr><td>CSV</td><td>Plain text, one row per sample. Large, and readable
+    anywhere.</td></tr>
+  <tr><td>TSV</td><td>The same rows separated by tabs, for places where a comma
+    is a decimal separator.</td></tr>
+  <tr><td>MATLAB</td><td>MATLAB v7.3, which is an HDF5 file.</td></tr>
+</table>
+<p>After each export the page reports what that file cost, measured on the file
+it just wrote rather than claimed about the format: how many samples it holds,
+whether every sample came back at the value it was recorded at, and the largest
+error if not. A recording that fails its own checksum is not exported at all.</p>
+<p><b>Data</b> exports the recording. <b>Analysis</b> exports the result you are
+looking at. <b>Data + analysis</b> exports both.</p>
+
+<h2>Deleting a recording</h2>
+<p><b>Delete</b> removes the selected recordings permanently, along with their
+metadata, events and checksums. It cannot be undone, and you will be asked to
+confirm. Use it for runs that were spoiled, so they cannot later be mistaken for
+valid data.</p>
+
+</main>
+<footer>Built by <a href="https://intomind.com">IntoMind</a> &copy; 2026</footer>
