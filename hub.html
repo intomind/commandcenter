@@ -1090,7 +1090,8 @@ async function loadModel(){
 }
 function renderModel(){
   if(!MODEL||!MODEL.supported){$('#modelBody').innerHTML='';return}
-  const heads=MODEL.heads||[];
+  /* The device lists every slot it has. An empty one is not a head. */
+  const heads=(MODEL.heads||[]).filter(x=>x.state!=='empty');
   const rows=[['State',MODEL.state],
               ['Embedding',MODEL.embedding?MODEL.embedding+' values':'—'],
               ['Encoder',MODEL.encoder_id||'—']];
@@ -1113,7 +1114,12 @@ function renderModel(){
       +'recording with the instrument library and uploaded from there, not '
       +'from this page.</div>';
   }else{
-    h+=`<label>head<select id=headSel>`+heads.map(x=>
+    /* With no head selected the list says so, rather than showing the first
+       head as if it were the one running, which also could not then be
+       chosen, because choosing what is shown changes nothing. */
+    h+=`<label>head<select id=headSel>`
+      +(MODEL.active_head==null?'<option value="" selected disabled>none selected</option>':'')
+      +heads.map(x=>
       `<option value="${esc(x.slot)}" ${x.slot===MODEL.active_head?'selected':''}
         ${x.usable?'':'disabled'}>slot ${esc(x.slot)}: ${esc(x.name||'unnamed')}
         (${esc(x.usable?x.outputs+' outputs':x.state)})${x.trained_beside_this_encoder===false?' *':''}</option>`).join('')

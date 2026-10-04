@@ -1645,6 +1645,41 @@ MODEL_1_3 = dict(supported=True, state="ready", embedding=76, encoder_id="e2f9b6
                              trained_beside_this_encoder=False)])
 
 
+def _empty_slot(slot):
+    return dict(slot=slot, state="empty", name="", outputs=0, head_id="0000000000000000",
+                usable=False, encoder_id="0000000000000000", trained_beside_this_encoder=None)
+
+
+def _model_panel(heads, active_head):
+    status = _status_1_3(name="Ada", adjective="Blue", composed_name="Ada's Blue IntoMind One",
+                         signal_source="electrodes", model_interval=0, model_interval_min=4)
+    model = {**MODEL_1_3, "heads": heads, "active_head": active_head}
+    out = render_page({"scenario": "device_status", "status": status,
+                       "routes": {**PAGE_ROUTES, "/api/model": model, "/api/config": {"applied": {}}}})
+    return out["model"]["html"]
+
+
+def test_the_model_panel_lists_the_heads_on_the_device_and_never_an_empty_slot():
+    """The device lists every slot it has, five on the IntoMind One, and an
+    empty slot is not a head. With none selected the list says so, rather
+    than showing a head as if it were running, which also could not then be
+    chosen, because choosing what is shown changes nothing."""
+    age = dict(slot=2, state="valid", name="age", outputs=1, head_id="cc", usable=True,
+               encoder_id="e2f9b60f411f0e73", trained_beside_this_encoder=True)
+    slots = [_empty_slot(0), _empty_slot(1), age, _empty_slot(3), _empty_slot(4)]
+    m = _model_panel(slots, None)
+    assert "slot 2: age" in m and "1 outputs" in m
+    assert not any(f"slot {s}:" in m for s in (0, 1, 3, 4)), m
+    assert "empty" not in m and "unnamed" not in m
+    assert ">none selected</option>" in m and "No heads on the device" not in m
+    # Once a head runs, the list shows it and offers no placeholder.
+    m = _model_panel(slots, 2)
+    assert "none selected" not in m and "selected" in m.split("slot 2: age")[0].rsplit("<option", 1)[1]
+    # A device whose every slot is empty has no heads, and says how to add one.
+    m = _model_panel([_empty_slot(s) for s in range(5)], None)
+    assert "No heads on the device" in m and "id=headSel" not in m
+
+
 def test_the_page_names_the_device_within_the_air_and_says_when_its_signal_is_synthetic():
     status = _status_1_3(name="Ada", adjective="Blue", composed_name="Ada's Blue IntoMind One",
                          signal_source="synthetic", model_interval=0, model_interval_min=4)
