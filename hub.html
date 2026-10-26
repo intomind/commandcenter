@@ -1381,6 +1381,11 @@ function exportSummary(s){
              +`LSB of ${(+s.lsb_uv).toPrecision(3)} µV`);
   else if(s.resolution_uv!=null)
     bits.push(`written to ${(+s.resolution_uv).toPrecision(3)} µV`);
+  if(s.samples_filled)
+    bits.push(`${s.samples_filled} lost samples filled and labeled as gaps`);
+  if(s.samples_before_restart)
+    bits.push(`${s.samples_before_restart} samples from before the recording `
+             +`started left out`);
   if((s.omitted||[]).length)bits.push('omitted: '+s.omitted.join(', '));
   if((s.provenance_problems||[]).length)
     bits.push('provenance: '+s.provenance_problems.join('; '));

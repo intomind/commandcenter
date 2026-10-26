@@ -156,6 +156,13 @@ you can analyze the same data several ways without losing anything.</p>
 it just wrote rather than claimed about the format: how many samples it holds,
 whether every sample came back at the value it was recorded at, and the largest
 error if not. A recording that fails its own checksum is not exported at all.</p>
+<p>In BDF and EDF every sample stays at the time it was recorded. Where samples
+were lost, the file fills the hole with the lowest value it can store and labels
+it <code>BAD_ACQ_SKIP</code>, the label MNE gives such a hole, and the page says
+how many samples it filled. Zero is not used, because it would make every
+recorded sample in an EDF file less precise. A recording that begins with
+samples from before it started is exported from its start, and the page says how
+many samples it left out.</p>
 <p><b>Data</b> exports the recording. <b>Analysis</b> exports the result you are
 looking at. <b>Data + analysis</b> exports both.</p>
 

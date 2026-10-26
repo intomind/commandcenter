@@ -636,6 +636,9 @@ def test_the_page_states_the_measured_cost_rather_than_a_claim():
     assert "counts_recovered" in s and "max_error_uv" in s
     assert "lsb_uv" in s, "an error with no LSB beside it is not a scale"
     assert "omitted" in s, "an array that was not written would go unmentioned"
+    assert "samples_filled" in s, "holes filled in the file would go unmentioned"
+    assert "samples_before_restart" in s, \
+        "samples left out at the start would go unmentioned"
 
 
 def test_an_unknown_format_is_refused_with_the_ones_that_exist():
