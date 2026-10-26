@@ -637,6 +637,7 @@ def test_the_page_states_the_measured_cost_rather_than_a_claim():
     assert "lsb_uv" in s, "an error with no LSB beside it is not a scale"
     assert "omitted" in s, "an array that was not written would go unmentioned"
     assert "samples_filled" in s, "holes filled in the file would go unmentioned"
+    assert "tail_filled" in s, "the filler completing the last block would go unmentioned"
     assert "samples_before_restart" in s, \
         "samples left out at the start would go unmentioned"
 

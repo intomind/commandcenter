@@ -63,15 +63,15 @@ for label in labels:
             else "values were rounded")
     err = (f", largest error {s['max_error_uv']:.6g} uV against an LSB of "
            f"{s['lsb_uv']:.6g} uV" if "max_error_uv" in s else "")
-    drop = (f", dropped {s['samples_dropped']} trailing samples"
-            if s.get("samples_dropped") else "")
     fill = (f", {s['samples_filled']} lost samples filled and labeled as gaps"
             if s.get("samples_filled") else "")
+    tail = (f", {s['tail_filled']} filler samples complete the last block"
+            if s.get("tail_filled") else "")
     head = (f", {s['samples_before_restart']} samples from before the recording "
             f"started left out" if s.get("samples_before_restart") else "")
     print(f"  {pathlib.Path(s['path']).name}  {s['samples']} samples x "
           f"{s['channels']} channels @ {s['sample_rate_hz']:.4f} Hz  "
-          f"{cost}{err}{drop}{fill}{head}")
+          f"{cost}{err}{fill}{tail}{head}")
     for note in s.get("omitted") or []:
         print(f"      omitted: {note}")
 

@@ -1383,6 +1383,9 @@ function exportSummary(s){
     bits.push(`written to ${(+s.resolution_uv).toPrecision(3)} µV`);
   if(s.samples_filled)
     bits.push(`${s.samples_filled} lost samples filled and labeled as gaps`);
+  if(s.tail_filled)
+    bits.push(`${s.tail_filled} filler samples complete the last block, `
+             +`labeled as a gap`);
   if(s.samples_before_restart)
     bits.push(`${s.samples_before_restart} samples from before the recording `
              +`started left out`);
