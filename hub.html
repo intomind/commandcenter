@@ -1391,6 +1391,15 @@ function exportSummary(s){
              +`started left out`);
   if(s.samples_dropped)   // a library older than 1.4.1 cut the last partial block
     bits.push(`${s.samples_dropped} recorded samples left out of the file`);
+  if(s.contact)
+    bits.push({'checked':'electrode contact checked',
+               'partly checked':'electrode contact checked for part of the recording',
+               'not checked':'electrode contact not checked',
+               'not known':'not recorded whether electrode contact was checked'}
+              [s.contact]||`electrode contact: ${s.contact}`);
+  if(s.electrode_off_stretches)
+    bits.push(`${s.electrode_off_stretches} stretches with an electrode off, `
+             +`labeled BAD_LEADOFF`);
   if((s.omitted||[]).length)bits.push('omitted: '+s.omitted.join(', '));
   if((s.provenance_problems||[]).length)
     bits.push('provenance: '+s.provenance_problems.join('; '));

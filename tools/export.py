@@ -72,9 +72,17 @@ for label in labels:
     # Nonzero only with a library older than 1.4.1, which cut the last partial block.
     drop = (f", {s['samples_dropped']} recorded samples left out of the file"
             if s.get("samples_dropped") else "")
+    contact = {"checked": "electrode contact checked",
+               "partly checked": "electrode contact checked for part of the recording",
+               "not checked": "electrode contact not checked",
+               "not known": "not recorded whether electrode contact was checked"}
+    seen = (f", {contact.get(s['contact'], s['contact'])}"
+            if s.get("contact") else "")
+    off = (f", {s['electrode_off_stretches']} stretches with an electrode off"
+           if s.get("electrode_off_stretches") else "")
     print(f"  {pathlib.Path(s['path']).name}  {s['samples']} samples x "
           f"{s['channels']} channels @ {s['sample_rate_hz']:.4f} Hz  "
-          f"{cost}{err}{fill}{tail}{head}{drop}")
+          f"{cost}{err}{fill}{tail}{head}{drop}{seen}{off}")
     for note in s.get("omitted") or []:
         print(f"      omitted: {note}")
 

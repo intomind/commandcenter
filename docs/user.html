@@ -166,8 +166,14 @@ the same way, so no recorded sample is cut, and the page says how many
 placeholders that took. With a library older than 1.4.1, which cut the last
 partial block, the page says how many recorded samples were left out. A recording that begins
 with samples from before it started is exported from its start, and the page
-says how many samples it left out. The electrode-off flags recorded with each
-sample are kept in npz and MATLAB exports only.</p>
+says how many samples it left out.</p>
+<p>Every format carries electrode contact where detection was on during the
+recording, and only there, because a reading of "attached" means nothing when
+nothing was checking. CSV and TSV add a column per channel: 1 where the
+electrode was off, 0 where it was attached, and empty where detection was off.
+BDF and EDF label each stretch an electrode was off <code>BAD_LEADOFF</code>,
+which MNE treats as bad. The page says whether contact was checked. A recording
+made before this was kept says it is not known.</p>
 <p><b>Data</b> exports the recording. <b>Analysis</b> exports the result you are
 looking at. <b>Data + analysis</b> exports both.</p>
 

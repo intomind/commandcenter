@@ -644,6 +644,9 @@ def test_the_page_states_the_measured_cost_rather_than_a_claim():
         "samples left out at the start would go unmentioned"
     assert "samples_dropped" in s, \
         "samples an older library left out of the file would go unmentioned"
+    for state in ("'checked'", "'partly checked'", "'not checked'", "'not known'"):
+        assert state in s, f"whether contact was checked would go unsaid: {state}"
+    assert "electrode_off_stretches" in s, "stretches with an electrode off would go unmentioned"
 
 
 def test_an_unknown_format_is_refused_with_the_ones_that_exist():

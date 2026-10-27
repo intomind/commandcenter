@@ -105,8 +105,15 @@ partial block, the page says how many recorded samples were left out. What
 every file holds and promises is on the documentation site's Recordings and
 files page. A capture that begins with samples
 from before the recording started is exported from the recording's start,
-and the page says how many samples it left out. The electrode-off flags
-recorded with each sample are kept in npz and MATLAB exports only.
+and the page says how many samples it left out.
+
+Every format carries electrode contact where detection was on during the
+recording, and only there, because a reading of "attached" means nothing
+when nothing was checking. CSV and TSV add a column per channel: 1 where the
+electrode was off, 0 where it was attached, and empty where detection was
+off. BDF and EDF label each stretch an electrode was off `BAD_LEADOFF`, which
+MNE treats as bad. The page says whether contact was checked. A recording
+made before this was kept says it is not known.
 
 ## It answers only this machine
 
