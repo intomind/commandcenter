@@ -626,6 +626,8 @@ def test_the_export_cli_uses_the_same_exporter_as_the_page():
     assert "from intomind import edf" not in src, \
         "the CLI writes a format directly, behind the exporter's refusal"
     assert "export.FORMATS" in src, "the CLI offers a list of its own"
+    assert "samples_dropped" in src, \
+        "samples an older library left out of the file would go unmentioned"
     assert not (ROOT / "tools" / "export_edf.py").exists(), \
         "a CLI named for one format still exports only that format"
 
@@ -640,6 +642,8 @@ def test_the_page_states_the_measured_cost_rather_than_a_claim():
     assert "tail_filled" in s, "the filler completing the last block would go unmentioned"
     assert "samples_before_restart" in s, \
         "samples left out at the start would go unmentioned"
+    assert "samples_dropped" in s, \
+        "samples an older library left out of the file would go unmentioned"
 
 
 def test_an_unknown_format_is_refused_with_the_ones_that_exist():

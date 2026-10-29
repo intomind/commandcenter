@@ -94,15 +94,16 @@ whether every sample came back at the value it was recorded at, and the largest
 error if not. A capture that fails its own checksum is not exported at all.
 
 In BDF and EDF every sample stays at the time it was recorded. Where samples
-were lost, the file fills the hole with the lowest value it can store and
-labels it `BAD_ACQ_SKIP`, the label MNE gives such a hole, and the page says
-how many samples it filled. A program that does not know the label shows a
-hole as a flat line at the bottom of the channel. These files are made of
-whole blocks of about a second, and the last block is completed after the
-last sample with the same filler under the same label, so no recorded sample
-is cut. The page says how many filler samples that took. Zero is not used,
-because it would make every recorded sample in an EDF file less precise. The
-library's README explains the choice. A capture that begins with samples
+were lost, the file fills the hole with a placeholder that repeats the last
+recorded value and labels it `BAD_ACQ_SKIP`, the label MNE gives such a hole,
+and the page says how many samples it filled. A program that does not know
+the label shows a hole as a flat line. These files are made of whole blocks
+of about a second, and the last block is completed after the last sample the
+same way, so no recorded sample is cut, and the page says how many
+placeholders that took. With a library older than 1.4.1, which cut the last
+partial block, the page says how many recorded samples were left out. What
+every file holds and promises is on the documentation site's Recordings and
+files page. A capture that begins with samples
 from before the recording started is exported from the recording's start,
 and the page says how many samples it left out. The electrode-off flags
 recorded with each sample are kept in npz and MATLAB exports only.

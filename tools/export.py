@@ -69,9 +69,12 @@ for label in labels:
             if s.get("tail_filled") else "")
     head = (f", {s['samples_before_restart']} samples from before the recording "
             f"started left out" if s.get("samples_before_restart") else "")
+    # Nonzero only with a library older than 1.4.1, which cut the last partial block.
+    drop = (f", {s['samples_dropped']} recorded samples left out of the file"
+            if s.get("samples_dropped") else "")
     print(f"  {pathlib.Path(s['path']).name}  {s['samples']} samples x "
           f"{s['channels']} channels @ {s['sample_rate_hz']:.4f} Hz  "
-          f"{cost}{err}{fill}{tail}{head}")
+          f"{cost}{err}{fill}{tail}{head}{drop}")
     for note in s.get("omitted") or []:
         print(f"      omitted: {note}")
 

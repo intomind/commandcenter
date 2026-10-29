@@ -1389,6 +1389,8 @@ function exportSummary(s){
   if(s.samples_before_restart)
     bits.push(`${s.samples_before_restart} samples from before the recording `
              +`started left out`);
+  if(s.samples_dropped)   // a library older than 1.4.1 cut the last partial block
+    bits.push(`${s.samples_dropped} recorded samples left out of the file`);
   if((s.omitted||[]).length)bits.push('omitted: '+s.omitted.join(', '));
   if((s.provenance_problems||[]).length)
     bits.push('provenance: '+s.provenance_problems.join('; '));
