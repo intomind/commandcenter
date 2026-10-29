@@ -678,7 +678,10 @@ class Hub:
                     running=self.running, live=self.live,
                     state=self.state_name(), actual=self.actual_state(),
                     caps=self.capabilities(),
-                    contact_detection="on" if self.contact_enabled else "off",
+                    # The device's own setting when it is known, from this host's
+                    # setting of it or from the packets, and "unknown" before either.
+                    contact_detection=("on" if self.contact_enabled else
+                                       "unknown" if self.actual_state().get("leadoff") is None else "off"),
                     prediction=self.prediction,
                     embeddings=self._embeddings_status(),
                     config_err=self._cfg_err)

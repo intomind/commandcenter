@@ -451,7 +451,7 @@ let CONNECT_ACK=false;
 let CADENCE=null;
 
 /* ---- plain language: internal vocabulary never reaches the screen ---- */
-const SVAL=v=>({true:'on',false:'off',on:'on',off:'off',
+const SVAL=v=>v==null?'unknown':({true:'on',false:'off',on:'on',off:'off',
   normal:'Electrodes',test:'Test signal',short:'Shorted',
   synthetic:'Synthetic signal'}[v]??v);
 
