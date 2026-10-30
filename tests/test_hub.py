@@ -929,7 +929,7 @@ def test_nothing_connects_by_itself():
     h = make_hub()
     h.dev.connected = False
     try:
-        run(h.connect("EE:AE:00:00:00:09"))
+        run(h.connect("02:00:00:00:00:09"))
     except RuntimeError as e:
         assert "not heard" in str(e)
     else:
