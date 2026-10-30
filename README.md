@@ -20,7 +20,7 @@ Needs Python 3.11 or newer, the instrument API, and:
 
 | package | what it is for |
 |---|---|
-| `intomind` | the instrument API: the link, the protocol, captures, exports, analyses |
+| `intomind` | the instrument API: the link, the protocol, recordings, exports, analyses |
 | `aiohttp` | the local server and its websocket |
 | `numpy` | the analyses |
 | `scipy` | the analyses |
@@ -84,14 +84,14 @@ manifest.
 
 Six formats, all of them the library's: `npz`, `edf`, `bdf`, `csv`, `tsv` and
 MATLAB v7.3. This application writes no file format of its own, because a
-second writer is a second set of rules about what a capture means and the two
+second writer is a second set of rules about what a recording means and the two
 would drift.
 
-Pick a capture, pick a format, and the file comes back through the browser. The
+Pick a recording, pick a format, and the file comes back through the browser. The
 page then reports what that export cost, measured on the file that was just
 written rather than claimed about the format: how many samples it holds,
 whether every sample came back at the value it was recorded at, and the largest
-error if not. A capture that fails its own checksum is not exported at all.
+error if not. A recording that fails its own checksum is not exported at all.
 
 In BDF and EDF every sample stays at the time it was recorded. Where samples
 were lost, the file fills the hole with a placeholder that repeats the last
@@ -103,7 +103,7 @@ same way, so no recorded sample is cut, and the page says how many
 placeholders that took. With a library older than 1.4.1, which cut the last
 partial block, the page says how many recorded samples were left out. What
 every file holds and promises is on the documentation site's Recordings and
-files page. A capture that begins with samples
+files page. A recording that begins with samples
 from before the recording started is exported from the recording's start,
 and the page says how many samples it left out.
 
@@ -153,12 +153,12 @@ screen.
 
 | | |
 |---|---|
-| `hub.py` | the local server: routes, capture lifecycle, device ownership |
+| `hub.py` | the local server: routes, recording lifecycle, device ownership |
 | `hub.html` | the page. One file, no build step, no external requests |
 | `hub.sh` | the desktop launcher: interpreter choice, one server, the window |
 | `install-launcher.sh` | generates and installs the `.desktop` entry and icon |
-| `context.py` | where this installation's captures are, stated once |
-| `tools/` | the capture CLIs: analyze, export, metrics, montage backfill |
+| `context.py` | where this installation's recordings are, stated once |
+| `tools/` | the recording CLIs: analyze, export, metrics, montage backfill |
 | `captures/` | the recordings this application made and reads |
 | `exports/` | files written out of those recordings, regenerable |
 | `docs/` | the user and developer documentation, served at `/docs/` |

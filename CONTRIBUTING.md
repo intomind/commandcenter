@@ -57,8 +57,8 @@ a public issue.
 Five things are true of this application, and a change that makes any of
 them false is a change to refuse.
 
-1. **A person is wearing the electrodes.** Nothing starts a capture or
-   changes a device setting on its own; a person asks for it.
+1. **A person is wearing the electrodes.** Nothing starts a recording or
+   changes a device setting on its own. A person asks for it.
 2. **The data stays on this machine.** No remotes, no uploads. The server
    answers only the machine it runs on, and `same_machine_only` is the whole
    of that defense: do not weaken it, and keep its test passing.
@@ -67,12 +67,12 @@ them false is a change to refuse.
    what processing it runs: all of it comes from `device.profile()` and
    `device.can()`, over the protocol. If this code ever branches on a device
    name, or holds a list of gains, rates, or modes, that is the bug.
-4. **A capture states how it was produced, and says unknown when it does not
+4. **A recording states how it was produced, and says unknown when it does not
    know.** `context.py` declares where the recordings live and which source
    tree recorded them, and declares a site only if this installation has one.
 5. **The library owns the formats.** Exports go through `intomind.export` and
    nothing here writes a file format of its own. A second writer is a second
-   set of rules about what a capture means.
+   set of rules about what a recording means.
 
 What is deliberately not here: any register level. There is no register map,
 no register cache, and no second control path behind the link. The device's
@@ -82,20 +82,20 @@ trains a head from a recording and uploads it, and one implementation is how
 what a head produces on the device stays identical to what it produces on
 the host.
 
-Some working rules: real numbers only, from the code that measured them; an
-export says what it cost by measuring the file it wrote; nothing works until
-it is checked against a build, a test, or hardware; the page is one file
-with no build step and no external requests, keep it so; a control that
+Some working rules. Real numbers only, from the code that measured them. An
+export says what it cost by measuring the file it wrote. Nothing works until
+it is checked against a build, a test, or hardware. The page is one file
+with no build step and no external requests, keep it so. A control that
 cannot do anything is worse than an absent one, so a route and its panel are
 deleted together.
 
 | | |
 |---|---|
-| `hub.py` | the local server: routes, capture lifecycle, device ownership |
+| `hub.py` | the local server: routes, recording lifecycle, device ownership |
 | `hub.html` | the page, one file, no build step |
-| `context.py` | where this installation's captures are, stated once |
+| `context.py` | where this installation's recordings are, stated once |
 | `hub.sh`, `install-launcher.sh` | the desktop launcher |
-| `tools/` | the capture command lines |
+| `tools/` | the recording command lines |
 | `exports/` | regenerable output, never the record |
 | `tests/run_all.py` | the suite: no device, no radio, no network |
 
